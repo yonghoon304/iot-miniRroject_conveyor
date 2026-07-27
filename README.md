@@ -93,6 +93,116 @@ void loop() {
     - 시리얼 입력에서 New Line,Carriage Return 선택,입력하면 값 이외에 \n값 데이터 전달됨
     ![alt text](image-5.png)
 
+- 적외선IR센서 테스트
+![alt text](image-7.png)
+
+- 서보모터 SG-90
+  - 확장핀 3 연결,시그널 D9 전달
+  - 각도 초기화 한 다음에 바를 연결
+
+```cpp
+// 서보모터
+#include <Servo.h>
+#define SERVO_PIN 9  // Digital 9
+Servo servo;
+
+void setup() {
+  Serial.begin(19200);
+  servo.attach(SERVO_PIN);  // 서보모터 연결
+  servo.write(0);  // 0도로 초기화(!)
+  delay(500);
+}
+
+void loop() {
+  if (Serial.available()) {
+    int value = Serial.parseInt();
+    servo.write(value);
+    Serial.println(value);
+    delay(100);
+  }
+}
+```
+
+- RGB LED 네오픽셀
+  - Adafruit NeoPixel 라이브러리 설치
+  ![alt text](image-8.png)
+```cpp
+// NeoPixel LED 
+#include <Adafruit_NeoPixel.h>
+#define PIN 5
+#define NUMPIXELS 3
+
+Adafruit_NeoPixel pixels(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
+
+void setup() {
+  pixels.begin();
+  pixels.setBrightness(50);
+}
+
+void loop() {
+  for (int i=0; i < NUMPIXELS; i++) {
+    pixels.setPixelColor(i, pixels.Color(255, 0, 0));
+    pixels.show();
+  }
+  delay(1000);
+  for (int i=0; i < NUMPIXELS; i++) {
+    pixels.setPixelColor(i, pixels.Color(0, 255, 0));
+    pixels.show();
+    delay(10);
+  }
+  delay(1000);
+  for (int i=0; i < NUMPIXELS; i++) {
+    pixels.setPixelColor(i, pixels.Color(0, 0, 255));
+    pixels.show();
+    delay(10);
+  }
+  delay(1000);
+}
+
+```
+
+- 컬러센서(TCS347725) 모듈
+  - RGB 색상 감지
+  ![alt text](image-9.png)
+  ```cpp
+  // Color Sensor
+#include <Wire.h>
+#include <Adafruit_TCS34725.h>
+
+Adafruit_TCS34725 TCS = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_50MS, TCS34725_GAIN_4X);
+
+void setup() {
+  Serial.begin(19200);
+  TCS.begin();  
+}
+
+void loop() {
+  uint16_t clear, red, green, blue;
+  delay(100);
+  TCS.getRawData(&red, &green, &blue, &clear);
+
+  int r = map(red, 0, 21504, 0, 2000);
+  int g = map(green, 0, 21504, 0, 2000);
+  int b = map(blue, 0, 21504, 0, 2000);
+
+  Serial.print("    R: ");
+  Serial.print(r);
+  Serial.print("    G: ");
+  Serial.print(g);
+  Serial.print("    B: ");
+  Serial.println(b);
+}
+
+  ```
+  ![alt text](image-10.png)
+  - 초기상태 RGB 4,3,3
+  - 파란색 물체 : 8 , 11 ,15
+  - 녹색 물체 : 14,18,10
+  - 보라색 물체 : 11,9,14
+  - 빨간색 물체 : 21,6,6
+  - 주황색 물체 : 29,15,9
+
+
 ### MQTT 통신 시스템
 
 ### Unity 디지털트윈 시스템

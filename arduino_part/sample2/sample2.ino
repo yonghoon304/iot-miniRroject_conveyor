@@ -1,26 +1,22 @@
-int motorSpeedPin = 10;
-int motorDirectionPin = 12;
-int value;
+// 적외선 IR 센서
+int sensor = A0;
+int val;
 
-void setup() {  
-  pinMode(motorDirectionPin, OUTPUT);
-  noTone(4);
+void setup() {
+  Serial.begin(19200);
+  pinMode(sensor, INPUT);
+  Serial.println("Arduino start!");
 }
 
 void loop() {
-  // 정방향
-  digitalWrite(motorDirectionPin, HIGH);
-  for (value = 0; value <= 255; value += 5) {
-    analogWrite(motorSpeedPin, value);
-    delay(30);
+  val = digitalRead(sensor);
+  if (val == LOW) {
+    Serial.println("Detected");
+    delay(300);
+  } else {
+    Serial.println("0");
+    delay(300);
   }
-  delay(1000);
 
-  // 역방
-  digitalWrite(motorDirectionPin, LOW);
-  for (value = 0; value <= 255; value += 5) {
-    analogWrite(motorSpeedPin, value);
-    delay(30);
-  }
-  delay(1000);
 }
+
